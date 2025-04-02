@@ -2,15 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GJChain Wallet</title>
-    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GJ Wallet</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #00c4cc;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #00a3aa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        th {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-    <h1>GJChain Wallet</h1>
-    <button onclick="createWallet()">Tạo Ví</button>
-    <input type="text" id="address" placeholder="Địa chỉ ví (gj...)">
-    <button onclick="checkBalance()">Xem Số Dư</button>
-    <pre id="output"></pre>
-    <script src="/script.js"></script>
+    <div class="container">
+        <h1>GJ Wallet</h1>
+        <button onclick="createWallet()">Tạo ví mới</button>
+        <button onclick="loadWallets()">Tải danh sách ví</button>
+        <table id="walletsTable">
+            <thead>
+                <tr>
+                    <th>Địa chỉ</th>
+                    <th>Số dư (GJCoin)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script>
+        async function createWallet() {
+            const response = await fetch('/create', { method: 'POST' });
+            const wallet = await response.json();
+            alert(`Ví mới: ${wallet.address}\nKhóa công khai: ${wallet.publicKey}\nKhóa riêng: ${wallet.privateKey}\nLưu khóa riêng!`);
+            loadWallets();
+        }
+
+        async function loadWallets() {
+            const response = await fetch('/wallets');
+            const wallets = await response.json();
+            const tbody = document.querySelector('#walletsTable tbody');
+            tbody.innerHTML = '';
+            wallets.forEach(wallet => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${wallet.address}</td><td>${wallet.balance}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        loadWallets();
+    </script>
 </body>
 </html>
