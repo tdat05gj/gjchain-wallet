@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const app = express();
 const port = process.env.PORT || 3002;
 
-// Khởi tạo Firebase với biến môi trường
 let serviceAccount;
 if (process.env.FIREBASE_ADMINSDK) {
     try {
@@ -38,6 +37,11 @@ app.post('/create', (req, res) => {
 app.get('/balance/:address', async (req, res) => {
     const walletDoc = await walletsCollection.doc(req.params.address).get();
     res.json(walletDoc.exists ? { balance: walletDoc.data().balance } : { error: 'Ví không tồn tại' });
+});
+
+app.get('/wallets', async (req, res) => {
+    const snapshot = await walletsCollection.get();
+    res.json(snapshot.docs.map(doc => ({ address: doc.id, balance: doc.data().balance })));
 });
 
 app.listen(port, () => console.log(`Wallet chạy tại http://localhost:${port}`));
